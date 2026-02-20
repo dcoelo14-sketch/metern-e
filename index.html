@@ -351,7 +351,7 @@ function displayNext2HoursForecast(data) {
         const time = data.minutely_15.time[i].slice(11, 16); // HH:MM
 
         // Icône Open-Meteo
-        const iconPath = `icons/${code}.png`;
+        const iconPath = `icons/weather/${code}.png`;
 
         container.innerHTML += `
             <div class="quarter">
@@ -498,6 +498,7 @@ function displayNext2HoursForecast(data) {
 
 </body>
 </html>
+
 
 
 
