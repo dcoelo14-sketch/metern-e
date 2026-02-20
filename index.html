@@ -1,34 +1,73 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <title>Météo locale – Ernée</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <label for="citySelect"><strong>Choisir une ville :</strong></label>
-    <select id="citySelect">
-        <option value="48.29764,-0.93143">Ernée</option>
-        <option value="48.2250,-1.18148">Chatillon</option>
+<meta charset="UTF-8">
+<title>Météo locale – Ernée</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    </select>
-    <div class="box">
-        <h2>Baromètre</h2>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #eef4f9;
+        padding: 16px;
+    }
+    h1 { color: #003366; }
 
-        <div id="barometer">
-            <div id="zones"></div>
-            <div id="ticks"></div>
-            <div id="needle"></div>
-            <div class="center"></div>
-            <div class="glass"></div>
-        </div>
+    .box {
+        background: #fff;
+        padding: 14px;
+        margin-bottom: 12px;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
 
-        <div style="text-align:center; margin-top:8px;">
-            Pression : <strong><span id="baroValue">—</span> hPa</strong>
-        </div>
-    </div>
+    .alert {
+        padding: 14px;
+        border-radius: 8px;
+        font-size: 1.1em;
+        font-weight: bold;
+        color: white;
+        margin-bottom: 10px;
+    }
 
+    .green { background: #2e7d32; }
+    .orange { background: #f57c00; }
+    .red { background: #c62828; }
 
-    <style>
-        #barometer {
+    .forecast {
+        font-weight: bold;
+    }
+
+    .update {
+        font-size: 0.85em;
+        color: #555;
+        text-align: right;
+    }
+
+    /* Prévisions 2h */
+    #forecast-2h {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .quarter {
+        background: rgba(255,255,255,0.8);
+        padding: 8px;
+        border-radius: 8px;
+        text-align: center;
+        font-size: 14px;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    }
+
+    .wicon {
+        width: 40px;
+        height: 40px;
+    }
+
+    /* Baromètre */
+    #barometer {
         width: 220px;
         height: 220px;
         border-radius: 50%;
@@ -39,7 +78,6 @@
         overflow: hidden;
     }
 
-    /* Zones colorées */
     #zones {
         position: absolute;
         width: 100%;
@@ -47,21 +85,15 @@
         border-radius: 50%;
         background:
             conic-gradient(
-                #c62828 0deg 60deg,      /* Rouge : 920–980 */
-                #f57c00 60deg 120deg,    /* Orange : 980–1000 */
-                #2e7d32 120deg 180deg    /* Vert : 1000–1040 */
+                #c62828 0deg 60deg,
+                #f57c00 60deg 120deg,
+                #2e7d32 120deg 180deg
             );
         transform: rotate(-100deg);
         opacity: 0.35;
     }
 
-    /* Graduations */
-    #ticks {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-    }
-
+    #ticks { position: absolute; width: 100%; height: 100%; }
     #ticks div {
         position: absolute;
         width: 2px;
@@ -71,7 +103,6 @@
         top: 8px;
         transform-origin: bottom center;
     }
-
     #ticks span {
         position: absolute;
         font-size: 12px;
@@ -81,7 +112,6 @@
         transform: translateX(-50%);
     }
 
-    /* Aiguille */
     #needle {
         width: 4px;
         height: 95px;
@@ -90,12 +120,10 @@
         top: 25px;
         left: 49%;
         transform-origin: bottom center;
-        transform: rotate(0deg);
         transition: transform 1s ease-out;
         z-index: 5;
     }
 
-    /* Centre */
     #barometer .center {
         width: 22px;
         height: 22px;
@@ -107,7 +135,6 @@
         z-index: 6;
     }
 
-    /* Effet verre bombé */
     .glass {
         position: absolute;
         width: 100%;
@@ -117,78 +144,69 @@
         pointer-events: none;
         z-index: 10;
     }
-
-
-            body {
-                font-family: Arial, sans-serif;
-                background: #eef4f9;
-                padding: 16px;
-            }
-            h1 { color: #003366; }
-
-            .box {
-                background: #fff;
-                padding: 14px;
-                margin-bottom: 12px;
-                border-radius: 8px;
-                box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-            }
-
-            .alert {
-                padding: 14px;
-                border-radius: 8px;
-                font-size: 1.1em;
-                font-weight: bold;
-                color: white;
-                margin-bottom: 10px;
-            }
-
-            .green { background: #2e7d32; }
-            .orange { background: #f57c00; }
-            .red { background: #c62828; }
-
-            .forecast {
-                font-weight: bold;
-            }
-
-            .update {
-                font-size: 0.85em;
-                color: #555;
-                text-align: right;
-            }
-    </style>
+</style>
 </head>
+
 <body>
 
-<h1>📍 Météo locale </h1>
+<h1>📍 Météo locale</h1>
+
+<label for="citySelect"><strong>Choisir une ville :</strong></label>
+<select id="citySelect">
+    <option value="48.29764,-0.93143">Ernée</option>
+    <option value="48.2250,-1.18148">Chatillon</option>
+</select>
 
 <div class="box">
-    🌡️ Température : <strong><span id="temp">—</span> °C  </strong>
+    <h2>Baromètre</h2>
+    <div id="barometer">
+        <div id="zones"></div>
+        <div id="ticks"></div>
+        <div id="needle"></div>
+        <div class="center"></div>
+        <div class="glass"></div>
+    </div>
+    <div style="text-align:center; margin-top:8px;">
+        Pression : <strong><span id="baroValue">—</span> hPa</strong>
+    </div>
+</div>
+
+<div class="box">
+    🌡️ Température : <strong><span id="temp">—</span> °C</strong>
     <span id="apare">-</span>°C<br>
     💧 Point de rosée : <strong><span id="dew">—</span> °C</strong><br>
-    Pare brise :<strong><span id="par">—</span></strong><br><br>
-    📉 Pression : <strong><span id="pNow">—</span> hPa &nbsp </strong>
+    Pare brise : <strong><span id="par">—</span></strong><br><br>
+
+    📉 Pression : <strong><span id="pNow">—</span> hPa</strong>
     <span id="pOld">—</span> hPa<br>
     Tendance (4 h) : <strong><span id="pTrend">—</span></strong><br>
 
+    💨 Vent : <strong><span id="wind">—</span> km/h</strong><br>
+    Dir : <strong><span id="direText">—</span></strong><br>
+    Rafales : <strong><span id="raf">—</span> km/h</strong><br>
 
-    💨 Vent : <strong><span id="wind">—</span> km/h</strong><br>   Dir: <strong><span id="direText">—</span></strong>
-    Rafales: <strong><span id="raf">—</span> km/h</strong> <br>
     🌧️ Pluie (1 h) : <strong><span id="rain">—</span> mm</strong><br>
     Nuages : <strong><span id="cloud">—</span>%</strong><br>
-    Visibilite : <strong><span id="visi">—</span>kms</strong>
+    Visibilité : <strong><span id="visi">—</span> km</strong>
     <span id="icon"></span><br>
-    15mn:<span id="code1">-</span>
 </div>
 
 <div id="alertBox" class="alert">Chargement…</div>
 
 <div class="box forecast" id="forecastText">—</div>
 
+<!-- SECTION OPTION B : Prévisions 2h -->
+<div class="box">
+    <h2>Prévisions sur 2 heures</h2>
+    <div id="forecast-2h"></div>
+</div>
+
 <div class="update">
     ⏱ Dernière mise à jour : <span id="updateTime">—</span><br>
     <span>022026 coelod</span>
 </div>
+
+
 
 <script>
     let lat = 48.29764;
@@ -220,14 +238,13 @@
         "&hourly=temperature_2m,dew_point_2m,rain,pressure_msl,precipitation,visibility,wind_speed_10m,wind_direction_10m,wind_gusts_10m,apparent_temperature,cloud_cover" +
         "&timezone=Europe%2FParis" +
         "&models=best_match" +
-		"&minutely_15=apparent_temperature,weather_code,forecast_minutely_15" +
+		"&minutely_15=apparent_temperature,weather_code"+
 		"&past_days=1"
-
 
         fetch(url)
         .then(r => r.json())
         .then(data => {
-    const u = data.minutely_15.time.length -1;
+    const u = data.minutely_15.time.length ;
            const now = new Date();
     const hourStr = now.toISOString().slice(0, 13);
     const i = data.hourly.time.findIndex(t => t.startsWith(hourStr));
@@ -272,8 +289,10 @@
     const dir = data.hourly.wind_direction_10m[i];
     const raf = data.hourly.wind_gusts_10m[i];
     const gel = temp - dew;
-	const code = data.minutely_15.weather_code[u];
-	
+	const code = data.minutely_15.weather_code[u-1];
+
+          displayNext2HoursForecast(data);
+
           /* Création des graduations */
     function createTicks() {
         const ticks = document.getElementById("ticks");
@@ -321,6 +340,28 @@
         lon = parseFloat(newLon);
         loadWeather(); // recharge la météo immédiatement
     });
+function displayNext2HoursForecast(data) {
+    const container = document.getElementById("forecast-2h");
+    container.innerHTML = ""; // reset
+
+    // 8 quarts d'heure = 2 heures
+    for (let i = 0; i < 8; i++) {
+        const code = data.minutely_15.weather_code[i];
+        const temp = data.minutely_15.temperature_2m[i];
+        const time = data.minutely_15.time[i].slice(11, 16); // HH:MM
+
+        // Icône Open-Meteo
+        const iconPath = `icons/weather/${code}.png`;
+
+        container.innerHTML += `
+            <div class="quarter">
+                <img src="${iconPath}" alt="code ${code}" class="wicon">
+                <div>${time}</div>
+                <div>${temp}°C</div>
+            </div>
+        `;
+    }
+}
 
 
             const icon = getWeatherIcon(rain, cloud, visi);
@@ -343,7 +384,8 @@
             document.getElementById("pOld").textContent = pOld.toFixed(1);
             document.getElementById("raf").textContent = raf.toFixed(0);
             document.getElementById("apare").textContent = apare.toFixed(1);
-
+            /*document.getElementById("code1").textContent = code1.toFixed(1);*/
+            /*document.getElementById("code2").textContent = code2.toFixed(1);*/
             let dire;
             if (dir > 10 && dir < 80 ) {
                 dire = "nord-est";
@@ -417,7 +459,7 @@
                 forecast = "Temps variable sans évolution marquée. ";
             }
             document.getElementById("forecastText").textContent =
-                "📝 Prévision : " + forecast +  previ + code1;
+                "📝 Prévision : " + forecast +  previ ;
 
             /* Alerte couleur */
             let alertText, alertClass;
@@ -452,6 +494,7 @@
     setInterval(loadWeather, refreshTime);
 </script>
 
+
+
 </body>
 </html>
-
