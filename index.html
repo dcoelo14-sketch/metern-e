@@ -291,7 +291,7 @@
     const gel = temp - dew;
 	const code = data.minutely_15.weather_code[u-1];
 
-          displayNext2HoursForecast(data);
+         
 
           /* Création des graduations */
     function createTicks() {
@@ -351,7 +351,7 @@ function displayNext2HoursForecast(data) {
         const time = data.minutely_15.time[i].slice(11, 16); // HH:MM
 
         // Icône Open-Meteo
-        const iconPath = `icons ${code}.png`;
+        const iconPath = `icons/${code}.png`;
 
         container.innerHTML += `
             <div class="quarter">
@@ -363,7 +363,7 @@ function displayNext2HoursForecast(data) {
     }
 }
 
-
+ displayNext2HoursForecast(data);
             const icon = getWeatherIcon(rain, cloud, visi);
 
             
@@ -498,5 +498,6 @@ function displayNext2HoursForecast(data) {
 
 </body>
 </html>
+
 
 
